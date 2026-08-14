@@ -1,0 +1,19 @@
+# Yocto/OpenEmbedded build output and caches
+build/
+tmp/
+tmp-*/
+sstate-cache/
+downloads/
+cache/
+bitbake-cookerdaemon.log
+
+# Buildroot output and downloads, if an external tree is developed here
+output/
+dl/
+
+# Editor / OS noise
+*.swp
+*~
+.vscode/
+.idea/
+.DS_Store
