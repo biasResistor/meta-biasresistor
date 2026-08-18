@@ -1,0 +1,13 @@
+# Arguments for the imulog service. Read by both the systemd unit and the
+# sysvinit script, so keep it to plain shell assignments.
+#
+#   -r HZ     sample rate; 1 Hz keeps the log small on a 64 MiB board
+#   -m NAME   IIO device name to match
+#   -q        no header, no summary
+#
+IMULOG_ARGS="-r 1"
+
+# sysvinit only: where the samples go. /var/log is a tmpfs on a stock poky
+# image, so a fast rate here is paid for in RAM.
+IMULOG_LOG="/var/log/imulog.csv"
+IMULOG_ERR="/var/log/imulog.err"

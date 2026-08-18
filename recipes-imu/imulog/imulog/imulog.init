@@ -1,0 +1,65 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          imulog
+# Required-Start:    $local_fs
+# Required-Stop:     $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: MPU6050 IIO sample logger
+### END INIT INFO
+
+NAME=imulog
+DAEMON=@BINDIR@/imulog
+PIDFILE=/var/run/$NAME.pid
+IMULOG_ARGS="-r 1"
+IMULOG_LOG=/var/log/imulog.csv
+IMULOG_ERR=/var/log/imulog.err
+
+[ -x "$DAEMON" ] || exit 0
+[ -r @SYSCONFDIR@/default/$NAME ] && . @SYSCONFDIR@/default/$NAME
+
+case "$1" in
+start)
+	echo -n "Starting $NAME: "
+	# start-stop-daemon cannot redirect output itself, so the daemon goes up
+	# through a shell. The exec replaces that shell, which keeps the pid
+	# written to $PIDFILE pointing at imulog rather than at a dead wrapper.
+	# Diagnostics go to their own file: folding stderr into $IMULOG_LOG
+	# would put non-CSV lines in the middle of the samples.
+	if start-stop-daemon -S -q -b -m -p "$PIDFILE" -a /bin/sh -- \
+		-c "exec $DAEMON $IMULOG_ARGS >> $IMULOG_LOG 2>> $IMULOG_ERR"; then
+		echo "OK"
+	else
+		echo "failed"
+		exit 1
+	fi
+	;;
+stop)
+	echo -n "Stopping $NAME: "
+	if start-stop-daemon -K -q -p "$PIDFILE"; then
+		echo "OK"
+	else
+		echo "failed"
+	fi
+	rm -f "$PIDFILE"
+	;;
+restart|force-reload)
+	"$0" stop
+	sleep 1
+	"$0" start
+	;;
+status)
+	if [ -r "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+		echo "$NAME running (pid $(cat "$PIDFILE"))"
+	else
+		echo "$NAME not running"
+		exit 3
+	fi
+	;;
+*)
+	echo "usage: $0 {start|stop|restart|status}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

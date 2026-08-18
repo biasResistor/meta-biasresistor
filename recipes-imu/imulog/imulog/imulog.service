@@ -1,0 +1,15 @@
+[Unit]
+Description=MPU6050 IIO sample logger
+After=local-fs.target
+
+[Service]
+Type=simple
+EnvironmentFile=-@SYSCONFDIR@/default/imulog
+ExecStart=@BINDIR@/imulog $IMULOG_ARGS
+# Samples go to the journal on stdout; stderr carries the startup line and
+# read errors. SIGTERM is handled, so the default KillMode is enough.
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
