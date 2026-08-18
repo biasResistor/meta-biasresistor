@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * BeagleBone Green with an InvenSense MPU6050 on the cape I2C bus.
+ *
+ * NOT YET VALIDATED ON HARDWARE. Written against the mainline board tree
+ * (am335x-bonegreen.dts, Linux 6.12) and the AM335x header pin tables; the
+ * board is on order. docs/bonegreen-mpu6050.md carries the list of checks
+ * this has to pass, and the one open question that only the hardware settles.
+ *
+ * Same include chain as the upstream board file, so this tree is that board
+ * plus one node.
+ */
+
+/dts-v1/;
+
+#include "am33xx.dtsi"
+#include "am335x-bone-common.dtsi"
+#include "am335x-bonegreen-common.dtsi"
+
+/ {
+	model = "TI AM335x BeagleBone Green with MPU6050";
+	compatible = "ti,am335x-bone-green", "ti,am335x-bone-black",
+		     "ti,am335x-bone", "ti,am33xx";
+};
+
+&i2c2 {
+	/*
+	 * P9_19 (SCL) and P9_20 (SDA). This bus is already enabled, with its
+	 * pinmux, in am335x-bone-common.dtsi: it is the cape bus and carries
+	 * the cape EEPROMs at 0x54-0x57. So there is nothing to set up here,
+	 * and 0x68 does not collide with anything the board already declares.
+	 *
+	 * The bus is declared at 100 kHz. Each sample is a handful of
+	 * two-byte register reads, which at that clock costs a couple of
+	 * milliseconds of bus time -- a ceiling on the practical sample rate
+	 * far below what the sensor can produce. It is enough for a health
+	 * log, and it is the reason the vibration analysis does not depend on
+	 * this path.
+	 */
+	imu@68 {
+		compatible = "invensense,mpu6050";
+		reg = <0x68>;
+
+		/*
+		 * INT is not wired, so no interrupt is declared. Without one
+		 * the driver registers no trigger and the IIO buffer stays
+		 * unavailable, leaving the sysfs channels as the data path.
+		 *
+		 * P9_12 is gpio1_28 (pad GPMC_BEN1) and no upstream node on
+		 * this board maps it, so that is the pin to use. Wiring INT
+		 * there and adding the two properties below -- plus an
+		 * #include <dt-bindings/interrupt-controller/irq.h> -- gets
+		 * the trigger and the buffered, kernel-timestamped path:
+		 *
+		 *	interrupt-parent = <&gpio1>;
+		 *	interrupts = <28 IRQ_TYPE_EDGE_RISING>;
+		 */
+	};
+};
