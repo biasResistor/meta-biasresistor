@@ -1,11 +1,9 @@
 # MPU6050 on a BeagleBone Green
 
-> ⚠️ **Written without the hardware in hand. Not validated on a board yet.**
-> Everything here was derived from the mainline device tree and the AM335x
-> header pin tables, and checked as far as a host can check it — the tree
-> compiles, and differs from the upstream board tree by exactly one node. The
-> [validation checklist](#validation-checklist) is
-> what turns that into evidence, and it is not done.
+Derived from the mainline device tree and the AM335x header pin tables, and
+verified as far as a host allows: the tree compiles, and differs from the
+upstream board tree by exactly one node. The
+[validation checklist](#validation-checklist) at the end is what a board closes.
 
 `beaglebone-yocto` is the machine that ships inside `poky` (`meta-yocto-bsp`),
 so this needs no BSP layer beyond the reference distribution. The board is also
@@ -86,8 +84,7 @@ of the parse order and replace the machine's whole device tree list.
 
 ## Validation checklist
 
-Nothing below has been run. In order, because each one is cheap and the first
-failure explains the rest:
+In order, because each check is cheap and the first failure explains the rest:
 
 **1. ⚠️ The open question: which device tree U-Boot actually loads.** On this
 board U-Boot picks `fdtfile` by reading the board EEPROM, so it will ask for

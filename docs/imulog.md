@@ -140,12 +140,11 @@ integration that the image will actually run.
 
 ## Validation
 
-> ⚠️ **Not yet run on hardware.** The program and its packaging are complete;
-> what is missing is a target with the sensor on it. The checks below are the
-> ones that close that gap, and they are the same on any board that exposes an
-> `mpu6050` as an IIO device.
+What is verified so far is on the host: the program builds clean and its
+packaging is complete. The checks below are the ones a target closes, and they
+are the same on any board that exposes an `mpu6050` as an IIO device.
 
-The checks, in order:
+In order:
 
 ```sh
 imulog -c 3 -r 10                 # scaled samples

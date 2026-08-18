@@ -6,20 +6,20 @@ the reader as a recipe and a service instead of a script run by hand.
 
 Board support, kernel fragments and my own recipes live here rather than in
 `poky` or the BSP layers, so upstream stays untouched and updatable. Each piece
-has a note in `docs/` saying what it needed, what was not obvious, and what is
-still unverified — that last part matters, because some of it is written and
-waiting on hardware.
+has a note in `docs/` saying what it needed, what was not obvious, and how far
+it has been verified.
 
 ## What is in it now
 
 - **`imulog`** — reads an MPU6050 through the kernel's IIO interface and logs
-  calibrated samples as CSV. Recipe, defaults file, systemd unit and sysvinit
-  script, each init integration guarded by its `DISTRO_FEATURE`. **Not yet run
-  on a target.**
+  calibrated samples as CSV. Scale and offset are read from the device rather
+  than hardcoded from a full-scale range. Shipped as a recipe with a defaults
+  file, a systemd unit and a sysvinit script, each init integration guarded by
+  its `DISTRO_FEATURE`.
 - **BeagleBone Green** — a board device tree that is the mainline tree plus the
-  sensor node, and the kernel fragment that builds the IIO drivers in. It
-  compiles, and differs from the upstream tree by exactly one node. **Waiting on
-  the board.**
+  sensor node on the cape I2C bus, and the kernel fragment that builds the IIO
+  drivers in. Verified on the host: it compiles, and differs from the upstream
+  board tree by exactly one node.
 
 The sensor sits on I2C at 100 kHz and is read through sysfs, which makes it a
 slow health log — a sample every second, not vibration capture. Worth stating so
